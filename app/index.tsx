@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,47 +9,27 @@ import {
 } from "react-native";
 import { Stack } from "expo-router";
 import { Colors } from "@/constants/Colors";
-
-const defaultTransactions = [
-  { id: 1, title: "Groceries", amount: 100, date: new Date() },
-  { id: 2, title: "Gas", amount: 50, date: new Date() },
-  { id: 3, title: "Dinner", amount: 75, date: new Date() },
-  { id: 4, title: "Car Wash", amount: 25, date: new Date() },
-  {
-    id: 5,
-    title: "Apple Developer Subscription",
-    amount: 99,
-    date: new Date(),
-  },
-];
+import { getTransactions, addTransaction, deleteTransaction } from "@/data/storage";
 
 export default function Index() {
-  const [transactions, setTransactions] = useState(defaultTransactions);
+  const [transactions, setTransactions] = useState<any>([]);
   const [newTransactionTitle, setNewTransactionTitle] = useState("");
   const [newTransactionAmount, setNewTransactionAmount] = useState("");
 
-  const addTransaction = () => {
+  useEffect(() => {
+    getTransactions().then(setTransactions);
+  }, []);
+
+  const myAddTransaction = () => {
     if (newTransactionTitle && newTransactionAmount) {
-      const id = transactions.length + 1;
-      setTransactions([
-        {
-          id,
-          title: newTransactionTitle,
-          amount: parseFloat(newTransactionAmount),
-          date: new Date(),
-        },
-        ...transactions,
-      ]);
+     addTransaction(newTransactionTitle, newTransactionAmount).then(setTransactions);
       setNewTransactionTitle("");
       setNewTransactionAmount("");
     }
   };
 
-  const deleteTransaction = (id: any) => {
-    const updatedTransactions = transactions.filter(
-      (transaction) => transaction.id !== id
-    );
-    setTransactions(updatedTransactions);
+  const myDeleteTransaction = (id: any) => {
+    deleteTransaction(id).then(setTransactions);
   };
 
   return (
@@ -57,7 +37,7 @@ export default function Index() {
       <Stack.Screen
         options={{
           title: `Total spent: ${formatAmount(
-            transactions.reduce((total, t) => total + t.amount, 0)
+            transactions.reduce((total: any, t: any) => total + t.amount, 0)
           )}`,
         }}
       />
@@ -74,7 +54,7 @@ export default function Index() {
           onChangeText={setNewTransactionAmount}
           placeholder="Amount"
         />
-        <TouchableOpacity style={styles.button} onPress={addTransaction}>
+        <TouchableOpacity style={styles.button} onPress={myAddTransaction}>
           <Text style={styles.buttonText}>+</Text>
         </TouchableOpacity>
       </View>
@@ -82,12 +62,12 @@ export default function Index() {
         data={transactions}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <TouchableOpacity onLongPress={() => deleteTransaction(item.id)}>
+          <TouchableOpacity onLongPress={() => myDeleteTransaction(item.id)}>
             <View style={styles.transactionItem}>
               <View>
                 <Text style={styles.description}>{item.title}</Text>
                 <Text style={styles.date}>
-                  {item.date.toLocaleDateString()}
+                  {new Date(item.date).toLocaleDateString()}
                 </Text>
               </View>
               <Text style={styles.amount}>{formatAmount(item.amount)}</Text>
