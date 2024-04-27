@@ -1,4 +1,4 @@
-import { createUser, readUsers } from '@/backend/db';
+import { createUser, readUsers } from '@/backend/prismaDb';
 
 export async function GET(request: Request) {
   const users = await readUsers();

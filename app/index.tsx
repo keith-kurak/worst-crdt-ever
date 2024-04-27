@@ -6,30 +6,46 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import { Stack } from "expo-router";
 import { Colors } from "@/constants/Colors";
-import { getTransactions, addTransaction, deleteTransaction } from "@/data/storage";
+import {
+  getTransactions,
+  addTransaction,
+  deleteTransaction,
+  syncWithServer,
+} from "@/data/storage";
 
 export default function Index() {
   const [transactions, setTransactions] = useState<any>([]);
   const [newTransactionTitle, setNewTransactionTitle] = useState("");
   const [newTransactionAmount, setNewTransactionAmount] = useState("");
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     getTransactions().then(setTransactions);
   }, []);
 
-  const myAddTransaction = () => {
+  const myAddTransaction = async () => {
     if (newTransactionTitle && newTransactionAmount) {
-     addTransaction(newTransactionTitle, newTransactionAmount).then(setTransactions);
+      await addTransaction(newTransactionTitle, newTransactionAmount);
+      setTransactions(await getTransactions());
       setNewTransactionTitle("");
       setNewTransactionAmount("");
     }
   };
 
-  const myDeleteTransaction = (id: any) => {
-    deleteTransaction(id).then(setTransactions);
+  const myDeleteTransaction = async (id: any) => {
+    await deleteTransaction(id);
+    setTransactions(await getTransactions());
+  };
+
+  const mySync = async () => {
+    setSyncing(true);
+    await syncWithServer();
+    setTransactions(await getTransactions());
+    setSyncing(false);
   };
 
   return (
@@ -37,8 +53,21 @@ export default function Index() {
       <Stack.Screen
         options={{
           title: `Total spent: ${formatAmount(
-            transactions.reduce((total: any, t: any) => total + t.amount, 0)
+            transactions.reduce(
+              (total: any, t: any) => total + parseFloat(t.amount),
+              0
+            )
           )}`,
+          headerRight: () => (
+            <TouchableOpacity
+              style={{ marginRight: Platform.OS === "web" ? 10 : undefined }}
+              onPress={mySync}
+            >
+              <Text style={{ fontSize: 16, color: Colors.light.tint }}>
+                Sync
+              </Text>
+            </TouchableOpacity>
+          ),
         }}
       />
       <View style={styles.header}>
@@ -60,14 +89,14 @@ export default function Index() {
       </View>
       <FlatList
         data={transactions}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.rowId.toString()}
         renderItem={({ item }) => (
-          <TouchableOpacity onLongPress={() => myDeleteTransaction(item.id)}>
+          <TouchableOpacity onLongPress={() => myDeleteTransaction(item.rowId)}>
             <View style={styles.transactionItem}>
               <View>
                 <Text style={styles.description}>{item.title}</Text>
                 <Text style={styles.date}>
-                  {new Date(item.date).toLocaleDateString()}
+                  {new Date(parseInt(item.timestamp)).toLocaleString()}
                 </Text>
               </View>
               <Text style={styles.amount}>{formatAmount(item.amount)}</Text>
@@ -79,8 +108,13 @@ export default function Index() {
   );
 }
 
-const formatAmount = (amount: number) => {
-  return "$" + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
+const formatAmount = (amount: string) => {
+  return (
+    "$" +
+    parseFloat(amount)
+      .toFixed(2)
+      .replace(/\d(?=(\d{3})+\.)/g, "$&,")
+  );
 };
 
 const styles = StyleSheet.create({
