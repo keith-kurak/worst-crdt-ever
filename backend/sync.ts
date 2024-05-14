@@ -12,6 +12,7 @@ type CrdtRecord = {
   value: string;
   tombstone?: boolean;
   timestamp: string;
+  clientName: string
 };
 
   async function initIfNeeded() {

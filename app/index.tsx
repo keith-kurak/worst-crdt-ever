@@ -95,9 +95,9 @@ export default function Index() {
             <View style={styles.transactionItem}>
               <View>
                 <Text style={styles.description}>{item.title}</Text>
-                <Text style={styles.date}>
-                  {new Date(parseInt(item.timestamp)).toLocaleString()}
-                </Text>
+                  <Text style={styles.date}>
+                    {new Date(parseInt(item.timestamp)).toLocaleString() + ` - ${item.clientName}`}
+                  </Text>
               </View>
               <Text style={styles.amount}>{formatAmount(item.amount)}</Text>
             </View>
