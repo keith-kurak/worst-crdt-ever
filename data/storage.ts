@@ -1,9 +1,20 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Crypto from "expo-crypto";
-import { sortBy } from "lodash";
+import { Platform } from "react-native";
+import { sortBy, last } from "lodash";
 import { uniqueNamesGenerator, starWars } from "unique-names-generator";
+// @ts-ignore
+import { nxt, recv } from "@tpp/hybrid-logical-clock";
 
-const key = "transactions3";
+// polyfill crypto on mobile (this also requires the patch on @tpp/simple-uuid)
+if (Platform.OS !== "web") {
+  // @ts-ignore
+  window.crypto = Crypto;
+}
+
+async function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export async function getTransactions() {
   return sortBy(await crdtToTransactions(), "timestamp").reverse();
@@ -19,6 +30,7 @@ export async function deleteTransaction(id: string) {
 
 export async function syncWithServer() {
   const records = await getCrdtRecords();
+  await delay(500);
   const response = await fetch("/sync", {
     method: "POST",
     headers: {
@@ -27,12 +39,15 @@ export async function syncWithServer() {
     body: JSON.stringify(records),
   });
   const updatedRecords = await response.json();
-  console.log(updatedRecords);
+  const lastRecord = last(sortBy(updatedRecords, "timestamp"));
+  if (lastRecord) {
+    recv(lastRecord.timestamp);
+  }
   await AsyncStorage.setItem(crdtDataset, JSON.stringify(updatedRecords));
 }
 
 // CRDT transactions
-const crdtDataset = "crdt3";
+const crdtDataset = "crdt4";
 
 type CrdtRecord = {
   recordId: string;
@@ -77,13 +92,27 @@ async function crdtToTransactions() {
       };
     }
   });
-  console.log(records);
   return Object.values(transactions);
 }
 
+let firstGetDone = false;
+
 export async function getCrdtRecords() {
-  const records = await AsyncStorage.getItem(crdtDataset);
-  return records ? JSON.parse(records) : [];
+  const recordsJson = await AsyncStorage.getItem(crdtDataset);
+
+  const records = recordsJson ? JSON.parse(recordsJson) : [];
+
+  // sync HLC on first load
+  if (!firstGetDone) {
+    const lastRecord = last(sortBy(records, "timestamp"));
+    if (lastRecord) {
+      recv(lastRecord.timestamp);
+    }
+
+    firstGetDone = true;
+  }
+
+  return records;
 }
 
 async function addNewTransaction_crdt(title: string, amount: string) {
@@ -106,6 +135,7 @@ async function createCrdtRecord(
   tombstone?: boolean
 ) {
   const clientName = await getUniqueClientName();
+  const timestamp = nxt();
   return {
     recordId: Crypto.randomUUID(),
     clientName,
@@ -113,7 +143,7 @@ async function createCrdtRecord(
     column,
     value,
     tombstone,
-    timestamp: new Date().getTime().toString(),
+    timestamp,
   };
 }
 

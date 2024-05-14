@@ -1,0 +1,35 @@
+diff --git a/node_modules/@tpp/simple-uuid/simple-uuid.js b/node_modules/@tpp/simple-uuid/simple-uuid.js
+index 8256580..55de2e3 100644
+--- a/node_modules/@tpp/simple-uuid/simple-uuid.js
++++ b/node_modules/@tpp/simple-uuid/simple-uuid.js
+@@ -11,7 +11,6 @@
+ function uuid(len) {
+   if(!len) len = 8
+   if(is_window_crypto_1()) return windows_crypto_uuid_1()
+-  if(is_nodejs_crypto_1()) return nodejs_crypto_uuid_1()
+   return math_random_uuid_1()
+ 
+   function math_random_uuid_1() {
+@@ -23,22 +22,12 @@ function uuid(len) {
+     return v.substring(0,len)
+   }
+ 
+-  function is_nodejs_crypto_1() {
+-    return typeof module !== 'undefined'
+-      && typeof require === 'function'
+-  }
+-
+   function is_window_crypto_1() {
+     return typeof window !== 'undefined'
+       && typeof window.crypto !== 'undefined'
+       && typeof window.crypto.getRandomValues == 'function'
+   }
+ 
+-  function nodejs_crypto_uuid_1() {
+-    let crypto = require('crypto')
+-    return rand_1(a => crypto.randomFillSync(a))
+-  }
+-
+   function windows_crypto_uuid_1() {
+     return rand_1(a => window.crypto.getRandomValues(a))
+   }

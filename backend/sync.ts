@@ -3,7 +3,7 @@
 import storage from "node-persist";
 import { unionBy } from "lodash";
 
-const dataset = "crdt3"
+const dataset = "crdt4"
 
 type CrdtRecord = {
   recordId: string;

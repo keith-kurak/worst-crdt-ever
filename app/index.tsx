@@ -16,6 +16,7 @@ import {
   deleteTransaction,
   syncWithServer,
 } from "@/data/storage";
+import { LoadingShade } from '@/components/LoadingShade';
 
 export default function Index() {
   const [transactions, setTransactions] = useState<any>([]);
@@ -96,7 +97,7 @@ export default function Index() {
               <View>
                 <Text style={styles.description}>{item.title}</Text>
                   <Text style={styles.date}>
-                    {new Date(parseInt(item.timestamp)).toLocaleString() + ` - ${item.clientName}`}
+                    {new Date(parseInt(item.timestamp.split(':')[0])).toLocaleString() + ` - ${item.clientName}`}
                   </Text>
               </View>
               <Text style={styles.amount}>{formatAmount(item.amount)}</Text>
@@ -104,6 +105,7 @@ export default function Index() {
           </TouchableOpacity>
         )}
       />
+      <LoadingShade isLoading={syncing} />
     </View>
   );
 }

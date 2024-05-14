@@ -3,6 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
+    "postinstall": "patch-package",
     "start": "expo start",
     "reset-project": "./scripts/reset-project.js",
     "android": "expo start --android",
@@ -15,9 +16,11 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@consento/hlc": "^2.1.0",
     "@expo/vector-icons": "^14.0.0",
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-navigation/native": "^6.0.2",
+    "@tpp/hybrid-logical-clock": "^1.0.0",
     "@types/lodash": "^4.17.1",
     "@types/node-persist": "^3.1.8",
     "expo": "^51.0.5",
