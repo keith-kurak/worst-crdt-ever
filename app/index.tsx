@@ -24,10 +24,6 @@ export default function Index() {
   const [newTransactionAmount, setNewTransactionAmount] = useState("");
   const [syncing, setSyncing] = useState(false);
 
-  useEffect(() => {
-    getTransactions().then(setTransactions);
-  }, []);
-
   const myAddTransaction = async () => {
     if (newTransactionTitle && newTransactionAmount) {
       await addTransaction(newTransactionTitle, newTransactionAmount);
@@ -48,6 +44,13 @@ export default function Index() {
     setTransactions(await getTransactions());
     setSyncing(false);
   };
+
+  useEffect(() => {
+    getTransactions().then(setTransactions);
+    setTimeout(() => {
+      mySync();
+    }, 500)
+  }, []);
 
   return (
     <View style={styles.container}>
