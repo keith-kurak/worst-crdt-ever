@@ -30,7 +30,7 @@ export async function deleteTransaction(id: string) {
 
 export async function syncWithServer() {
   const records = await getCrdtRecords();
-  await delay(500);
+  await delay(1000);
   const response = await fetch("/sync", {
     method: "POST",
     headers: {

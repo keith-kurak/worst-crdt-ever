@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { Stack } from "expo-router";
 import { Colors } from "@/constants/Colors";
@@ -16,7 +17,7 @@ import {
   deleteTransaction,
   syncWithServer,
 } from "@/data/storage";
-import { LoadingShade } from '@/components/LoadingShade';
+import { LoadingShade } from "@/components/LoadingShade";
 
 export default function Index() {
   const [transactions, setTransactions] = useState<any>([]);
@@ -49,8 +50,17 @@ export default function Index() {
     getTransactions().then(setTransactions);
     setTimeout(() => {
       mySync();
-    }, 500)
+    }, 500);
   }, []);
+
+  // scary auto-sync code!
+
+  /*useEffect(() => {
+    const interval = setInterval(() => {
+      mySync();
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);*/
 
   return (
     <View style={styles.container}>
@@ -67,9 +77,13 @@ export default function Index() {
               style={{ marginRight: Platform.OS === "web" ? 10 : undefined }}
               onPress={mySync}
             >
-              <Text style={{ fontSize: 16, color: Colors.light.tint }}>
-                Sync
-              </Text>
+              {syncing ? (
+                <ActivityIndicator size="small" />
+              ) : (
+                <Text style={{ fontSize: 16, color: Colors.light.tint }}>
+                  Sync
+                </Text>
+              )}
             </TouchableOpacity>
           ),
         }}
@@ -87,7 +101,7 @@ export default function Index() {
           onChangeText={setNewTransactionAmount}
           placeholder="Amount"
         />
-        <TouchableOpacity style={styles.button} onPress={myAddTransaction}>
+        <TouchableOpacity style={styles.button} disabled={syncing} onPress={myAddTransaction}>
           <Text style={styles.buttonText}>+</Text>
         </TouchableOpacity>
       </View>
@@ -99,16 +113,17 @@ export default function Index() {
             <View style={styles.transactionItem}>
               <View>
                 <Text style={styles.description}>{item.title}</Text>
-                  <Text style={styles.date}>
-                    {new Date(parseInt(item.timestamp.split(':')[0])).toLocaleString() + ` - ${item.clientName}`}
-                  </Text>
+                <Text style={styles.date}>
+                  {new Date(
+                    parseInt(item.timestamp.split(":")[0])
+                  ).toLocaleString() + ` - ${item.clientName}`}
+                </Text>
               </View>
               <Text style={styles.amount}>{formatAmount(item.amount)}</Text>
             </View>
           </TouchableOpacity>
         )}
       />
-      <LoadingShade isLoading={syncing} />
     </View>
   );
 }
