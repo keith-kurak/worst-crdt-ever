@@ -1,4 +1,20 @@
-# Welcome to your Expo app 👋
+# Soar Above the Cloud! How Local First Software Can Help Users and Developers
+
+## Slides!
+[Slides](https://docs.google.com/presentation/d/1Me8xcTt5A9dyZF3l8HSx6bhbyB0AAcODimGRS8T-l4Y/edit?usp=sharing)
+
+## Talk to me
+[Keith Kurak](https://twitter.com/llamaluvr)
+
+## Prisma React Native demos
+- [React Native Prisma example](https://github.com/sorenbs/budget-buddy-expo)
+- [Experimental Sync example](https://github.com/sorenbs/budget-buddy-experimental-sync)
+
+## Other links
+- [James Long: CRDT's for mortals](https://www.youtube.com/watch?v=DEcwa68f-jY)
+- [Soren Bramer Schmidt: Prisma for Expo demo](https://www.youtube.com/live/MdCn0Iq0ucU?si=cYUiKUDllm1m0qO9&t=22603)
+
+# How to Run the Example / Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
