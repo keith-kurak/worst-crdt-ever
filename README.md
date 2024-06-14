@@ -4,7 +4,8 @@
 [Slides](https://docs.google.com/presentation/d/1Me8xcTt5A9dyZF3l8HSx6bhbyB0AAcODimGRS8T-l4Y/edit?usp=sharing)
 
 ## Talk to me
-[Keith Kurak](https://twitter.com/llamaluvr)
+[Keith Kurak - X](https://twitter.com/llamaluvr)
+[LinkedIn](https://www.linkedin.com/in/keith-kurak/)
 
 ## Prisma React Native demos
 - [React Native Prisma example](https://github.com/sorenbs/budget-buddy-expo)
@@ -13,6 +14,7 @@
 ## Other links
 - [James Long: CRDT's for mortals](https://www.youtube.com/watch?v=DEcwa68f-jY)
 - [Soren Bramer Schmidt: Prisma for Expo demo](https://www.youtube.com/live/MdCn0Iq0ucU?si=cYUiKUDllm1m0qO9&t=22603)
+- [Live coding with Prisma for React Native](https://www.youtube.com/watch?v=65Iqes0lxpQ)
 
 # How to Run the Example / Welcome to your Expo app 👋
 
