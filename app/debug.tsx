@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import { View, Text, FlatList } from "react-native";
 import { Stack } from "expo-router";
 import { getCrdtRecords } from "@/data/storage";
 import { sortBy } from 'lodash';

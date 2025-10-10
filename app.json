@@ -32,7 +32,9 @@
         {
           "origin": "https://money-thing.dev/"
         }
-      ]
+      ],
+      "expo-font",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

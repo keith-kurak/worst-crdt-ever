@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Crypto from "expo-crypto";
 import { Platform } from "react-native";
-import { sortBy, last } from "lodash";
+import { sortBy, last, uniqBy } from "lodash";
 import { uniqueNamesGenerator, starWars } from "unique-names-generator";
 // @ts-ignore
 import { nxt, recv } from "@tpp/hybrid-logical-clock";
@@ -38,7 +38,8 @@ export async function syncWithServer() {
     },
     body: JSON.stringify(records),
   });
-  const updatedRecords = await response.json();
+  let updatedRecords = [...await getCrdtRecords(), ...await response.json()];
+  updatedRecords = uniqBy(updatedRecords, "recordId");
   const lastRecord = last(sortBy(updatedRecords, "timestamp"));
   if (lastRecord) {
     recv(lastRecord.timestamp);

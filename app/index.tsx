@@ -55,12 +55,12 @@ export default function Index() {
 
   // scary auto-sync code!
 
-  /*useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       mySync();
     }, 3000);
     return () => clearInterval(interval);
-  }, []);*/
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -101,7 +101,7 @@ export default function Index() {
           onChangeText={setNewTransactionAmount}
           placeholder="Amount"
         />
-        <TouchableOpacity style={styles.button} disabled={syncing} onPress={myAddTransaction}>
+        <TouchableOpacity style={styles.button} disabled={false} onPress={myAddTransaction}>
           <Text style={styles.buttonText}>+</Text>
         </TouchableOpacity>
       </View>
@@ -109,7 +109,7 @@ export default function Index() {
         data={transactions}
         keyExtractor={(item) => item.rowId.toString()}
         renderItem={({ item }) => (
-          <TouchableOpacity onLongPress={() => myDeleteTransaction(item.rowId)}>
+          <TouchableOpacity onLongPress={() => myDeleteTransaction(item.rowId)} disabled={false}>
             <View style={styles.transactionItem}>
               <View>
                 <Text style={styles.description}>{item.title}</Text>
