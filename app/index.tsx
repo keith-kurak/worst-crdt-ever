@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   Platform,
   ActivityIndicator,
 } from "react-native";
-import { Stack } from "expo-router";
+import { useRouter, Stack, useFocusEffect } from "expo-router";
 import { Colors } from "@/constants/Colors";
 import {
   getTransactions,
@@ -24,6 +24,20 @@ export default function Index() {
   const [newTransactionTitle, setNewTransactionTitle] = useState("");
   const [newTransactionAmount, setNewTransactionAmount] = useState("");
   const [syncing, setSyncing] = useState(false);
+
+  const router = useRouter();
+
+  useFocusEffect(useCallback(() => {
+    let cancelled = false;
+    (async () => {
+      if (!cancelled) {
+        setTransactions(await getTransactions());
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []));
 
   const myAddTransaction = async () => {
     if (newTransactionTitle && newTransactionAmount) {
@@ -101,7 +115,11 @@ export default function Index() {
           onChangeText={setNewTransactionAmount}
           placeholder="Amount"
         />
-        <TouchableOpacity style={styles.button} disabled={false} onPress={myAddTransaction}>
+        <TouchableOpacity
+          style={styles.button}
+          disabled={false}
+          onPress={myAddTransaction}
+        >
           <Text style={styles.buttonText}>+</Text>
         </TouchableOpacity>
       </View>
@@ -109,7 +127,11 @@ export default function Index() {
         data={transactions}
         keyExtractor={(item) => item.rowId.toString()}
         renderItem={({ item }) => (
-          <TouchableOpacity onLongPress={() => myDeleteTransaction(item.rowId)} disabled={false}>
+          <TouchableOpacity
+            onPress={() => router.push(`/transactions/${item.rowId}`)}
+            onLongPress={() => myDeleteTransaction(item.rowId)}
+            disabled={false}
+          >
             <View style={styles.transactionItem}>
               <View>
                 <Text style={styles.description}>{item.title}</Text>

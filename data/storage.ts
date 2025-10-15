@@ -24,6 +24,10 @@ export async function addTransaction(title: string, amount: string) {
   await addNewTransaction_crdt(title, amount);
 }
 
+export async function editTransaction(id: string, description: string, amount: string) {
+  await editTransaction_crdt(id, { title: description, amount });
+}
+
 export async function deleteTransaction(id: string) {
   await deleteTransaction_crdt(id);
 }
@@ -122,6 +126,15 @@ async function addNewTransaction_crdt(title: string, amount: string) {
     await createCrdtRecord(rowId, "title", title),
     await createCrdtRecord(rowId, "amount", amount),
   ];
+  await writeCrdtRecords(records);
+}
+
+async function editTransaction_crdt(rowId: string, updates: { [key: string]: string }) {
+  const records: CrdtRecord[] = await Promise.all(
+    Object.entries(updates).map(([column, value]) =>
+      createCrdtRecord(rowId, column, value)
+    )
+  );
   await writeCrdtRecords(records);
 }
 
