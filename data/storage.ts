@@ -34,7 +34,7 @@ export async function deleteTransaction(id: string) {
 
 export async function syncWithServer() {
   const records = await getCrdtRecords();
-  await delay(1000);
+  await delay(1000); // loading times make stuff look smarter
   const response = await fetch("/sync", {
     method: "POST",
     headers: {
@@ -42,17 +42,18 @@ export async function syncWithServer() {
     },
     body: JSON.stringify(records),
   });
+  // spot the race condition waiting to happen
   let updatedRecords = [...await getCrdtRecords(), ...await response.json()];
   updatedRecords = uniqBy(updatedRecords, "recordId");
   const lastRecord = last(sortBy(updatedRecords, "timestamp"));
   if (lastRecord) {
-    recv(lastRecord.timestamp);
+    recv(lastRecord.timestamp); // HLC magic, I guess
   }
   await AsyncStorage.setItem(crdtDataset, JSON.stringify(updatedRecords));
 }
 
 // CRDT transactions
-const crdtDataset = "crdt4";
+const crdtDataset = "crdt4"; // change this every time you break something to reset
 
 type CrdtRecord = {
   recordId: string;
