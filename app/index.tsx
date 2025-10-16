@@ -20,6 +20,7 @@ import {
 import { LoadingShade } from "@/components/LoadingShade";
 
 export default function Index() {
+  const [syncingEnabled, setSyncingEnabled] = useState(true);
   const [transactions, setTransactions] = useState<any>([]);
   const [newTransactionTitle, setNewTransactionTitle] = useState("");
   const [newTransactionAmount, setNewTransactionAmount] = useState("");
@@ -27,17 +28,19 @@ export default function Index() {
 
   const router = useRouter();
 
-  useFocusEffect(useCallback(() => {
-    let cancelled = false;
-    (async () => {
-      if (!cancelled) {
-        setTransactions(await getTransactions());
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []));
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      (async () => {
+        if (!cancelled) {
+          setTransactions(await getTransactions());
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
+    }, [])
+  );
 
   const myAddTransaction = async () => {
     if (newTransactionTitle && newTransactionAmount) {
@@ -71,10 +74,13 @@ export default function Index() {
 
   useEffect(() => {
     const interval = setInterval(() => {
+      if (!syncingEnabled) {
+        return;
+      }
       mySync();
     }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [syncingEnabled]);
 
   return (
     <View style={styles.container}>
@@ -86,6 +92,22 @@ export default function Index() {
               0
             )
           )}`,
+          headerTitleAlign: "center",
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{ marginLeft: Platform.OS === "web" ? 10 : undefined }}
+              onPress={() => setSyncingEnabled(!syncingEnabled)}
+            >
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: syncingEnabled ? Colors.light.tint : "#ccc",
+                }}
+              >
+                {syncingEnabled ? "Sync On" : "Sync Off"}
+              </Text>
+            </TouchableOpacity>
+          ),
           headerRight: () => (
             <TouchableOpacity
               style={{ marginRight: Platform.OS === "web" ? 10 : undefined }}
